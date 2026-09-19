@@ -10,7 +10,8 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.getenv("PORT", 10000))
-WEBHOOK_URL = f"https://zerolife-genesis.onrender.com"
+# Исправили букву 'o' на цифру '0', как в панели Render
+WEBHOOK_URL = f"https://zer0life-genesis.onrender.com"
 
 if not TOKEN:
     logging.error("BOT_TOKEN is not set!")
