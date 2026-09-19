@@ -24,7 +24,7 @@ async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🎮 Play", url="https://t.me/Zer0lifelabs_ai_bot")],
-            [InlineKeyboardButton(text="💎 Buy ZRL", url="https://t.me/your_token_link")],
+            [InlineKeyboardButton(text="💎 Buy ZRL", url="https://www.ponsfamily.com/launchpad/0x09bbf85C1C1ad7518847733fc64e161557056200")],
             [InlineKeyboardButton(text="☕ Donate (SOL, ETH, BNB)", callback_data="donate_info")]
         ]
     )
