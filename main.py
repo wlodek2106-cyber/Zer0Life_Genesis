@@ -23,19 +23,37 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🎮 Играть", url="https://t.me/your_game_link")],
-            [InlineKeyboardButton(text="💎 Купить ZRL", url="https://t.me/your_token_link")]
+            [InlineKeyboardButton(text="🎮 Play / Играть", url="https://t.me/Zer0lifelabs_ai_bot")],
+            [InlineKeyboardButton(text="💎 Buy ZRL / Купить ZRL", url="https://t.me/your_token_link")],
+            [InlineKeyboardButton(text="☕ Донаты / Donate (SOL, ETH, BNB)", callback_data="donate_info")]
         ]
     )
     
-    # Твой правильный file_id видео
     video_file_id = "BAACAgIAAxkBAAIrGWqujnZn-ijNnIrt_gJsams6kowAAymuAAJ39GhJYt62HlDP-GE9BA"
+    
+    caption_text = (
+        "Welcome to Zer0Life! Choose an action:\n\n"
+        "Добро пожаловать в Zer0Life! Выбери действие:"
+    )
     
     await message.answer_video(
         video=video_file_id,
-        caption="Добро пожаловать в Zer0Life! Выбери действие:",
+        caption=caption_text,
         reply_markup=keyboard
     )
+
+# Обработчик нажатия на кнопку донатов
+@dp.callback_query(F.data == "donate_info")
+async def process_donate(callback: types.CallbackQuery):
+    donate_text = (
+        "☕ **Поддержать проект / Support the project:**\n\n"
+        "🔹 **Solana (SOL):** `ТВОЙ_КОШЕЛЕК_SOL`\n"
+        "🔹 **Ethereum (ETH):** `ТВОЙ_КОШЕЛЕК_ETH`\n"
+        "🔹 **BNB (BSC):** `ТВОЙ_КОШЕЛЕК_BNB`\n\n"
+        "Спасибо за поддержку Zer0Life! 🙏"
+    )
+    await callback.message.answer(donate_text, parse_mode="Markdown")
+    await callback.answer() # Закрываем анимацию загрузки на кнопке
 
 async def on_startup(bot: Bot):
     await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
