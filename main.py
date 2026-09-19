@@ -23,18 +23,15 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🎮 Play / Играть", url="https://t.me/Zer0lifelabs_ai_bot")],
-            [InlineKeyboardButton(text="💎 Buy ZRL / Купить ZRL", url="https://t.me/your_token_link")],
-            [InlineKeyboardButton(text="☕ Донаты / Donate (SOL, ETH, BNB)", callback_data="donate_info")]
+            [InlineKeyboardButton(text="🎮 Play", url="https://t.me/Zer0lifelabs_ai_bot")],
+            [InlineKeyboardButton(text="💎 Buy ZRL", url="https://t.me/your_token_link")],
+            [InlineKeyboardButton(text="☕ Donate (SOL, ETH, BNB)", callback_data="donate_info")]
         ]
     )
     
     video_file_id = "BAACAgIAAxkBAAIrGWqujnZn-ijNnIrt_gJsams6kowAAymuAAJ39GhJYt62HlDP-GE9BA"
     
-    caption_text = (
-        "Welcome to Zer0Life! Choose an action:\n\n"
-        "Добро пожаловать в Zer0Life! Выбери действие:"
-    )
+    caption_text = "Welcome to Zer0Life! Choose an action:"
     
     await message.answer_video(
         video=video_file_id,
@@ -46,14 +43,14 @@ async def cmd_start(message: types.Message):
 @dp.callback_query(F.data == "donate_info")
 async def process_donate(callback: types.CallbackQuery):
     donate_text = (
-        "☕ **Поддержать проект / Support the project:**\n\n"
-        "🔹 **Solana (SOL):** `ТВОЙ_КОШЕЛЕК_SOL`\n"
-        "🔹 **Ethereum (ETH):** `ТВОЙ_КОШЕЛЕК_ETH`\n"
-        "🔹 **BNB (BSC):** `ТВОЙ_КОШЕЛЕК_BNB`\n\n"
-        "Спасибо за поддержку Zer0Life! 🙏"
+        "☕ **Support the project:**\n\n"
+        "🔹 **Solana (SOL):**\n`5HX8uQvTE27DK27pRudHBGAy1EfR6uupDZssqkk3Yrpz`\n\n"
+        "🔹 **Ethereum (ETH):**\n`0x7901D7566766379f9ffc11326762883D6161183f`\n\n"
+        "🔹 **BNB (BSC):**\n`0x7901D7566766379f9ffc11326762883D6161183f`\n\n"
+        "Thank you for supporting Zer0Life! 🙏"
     )
     await callback.message.answer(donate_text, parse_mode="Markdown")
-    await callback.answer() # Закрываем анимацию загрузки на кнопке
+    await callback.answer()
 
 async def on_startup(bot: Bot):
     await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
