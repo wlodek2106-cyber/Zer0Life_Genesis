@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 from aiohttp import web
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, F, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
@@ -19,7 +19,7 @@ if not TOKEN:
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-@dp.message(lambda message: message.text == "/start")
+@dp.message(F.text == "/start")
 async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -27,15 +27,10 @@ async def cmd_start(message: types.Message):
             [InlineKeyboardButton(text="💎 Купить ZRL", url="https://t.me/your_token_link")]
         ]
     )
-    video_url = "https://example.com/your_video.mp4"
-    await message.answer_video(
-        video=video_url,
-        caption="Добро пожаловать! Выбери действие:",
-        reply_markup=keyboard
-    )
+    await message.answer("Добро пожаловать в Zer0Life! Выбери действие:", reply_markup=keyboard)
 
 async def on_startup(bot: Bot):
-    await bot.set_webhook(f"{WEBHOOK_URL}/webhook")
+    await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
 
 def main():
     app = web.Application()
