@@ -4,13 +4,13 @@ import logging
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.web_hook import SimpleRequestHandler
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.getenv("PORT", 10000))
-WEBHOOK_URL = f"https://zerolife-genesis.onrender.com"  # URL твоего сервиса на Render
+WEBHOOK_URL = f"https://zerolife-genesis.onrender.com"
 
 if not TOKEN:
     logging.error("BOT_TOKEN is not set!")
@@ -27,10 +27,10 @@ async def cmd_start(message: types.Message):
             [InlineKeyboardButton(text="💎 Купить ZRL", url="https://t.me/your_token_link")]
         ]
     )
-    video_url = "https://example.com/your_video.mp4" # Ссылка на твое видео
+    video_url = "https://example.com/your_video.mp4"
     await message.answer_video(
         video=video_url,
-        caption="Добро пожаловать в Zer0Life! Выбери действие:",
+        caption="Добро пожаловать! Выбери действие:",
         reply_markup=keyboard
     )
 
@@ -44,6 +44,7 @@ def main():
         bot=bot,
     )
     webhook_requests_handler.register(app, path="/webhook")
+    setup_application(app, dp, bot=bot)
     app.on_startup.append(lambda _: on_startup(bot))
     web.run_app(app, host="0.0.0.0", port=PORT)
 
