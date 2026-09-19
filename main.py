@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.getenv("PORT", 10000))
-# Исправили букву 'o' на цифру '0', как в панели Render
 WEBHOOK_URL = f"https://zer0life-genesis.onrender.com"
 
 if not TOKEN:
@@ -28,7 +27,15 @@ async def cmd_start(message: types.Message):
             [InlineKeyboardButton(text="💎 Купить ZRL", url="https://t.me/your_token_link")]
         ]
     )
-    await message.answer("Добро пожаловать в Zer0Life! Выбери действие:", reply_markup=keyboard)
+    
+    # Твой реальный file_id видео
+    video_file_id = "BAACAgIAAxkBAAIrGWqujnZn-ijNnIrt_gJsams6kowAAymuAAJ39GhJYt62HlDP-GE9BA"
+    
+    await message.answer_video(
+        video=video_file_id,
+        caption="Добро пожаловать в Zer0Life! Выбери действие:",
+        reply_markup=keyboard
+    )
 
 async def on_startup(bot: Bot):
     await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
