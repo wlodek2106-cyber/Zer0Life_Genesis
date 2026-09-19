@@ -27,13 +27,15 @@ async def cmd_start(message: types.Message):
             [InlineKeyboardButton(text="💎 Купить ZRL", url="https://t.me/your_token_link")]
         ]
     )
-    await message.answer("Добро пожаловать в Zer0Life! Выбери действие:", reply_markup=keyboard)
-
-# Бот поймает видео и пришлет правильный file_id в чат
-@dp.message(F.video)
-async def get_video_id(message: types.Message):
-    file_id = message.video.file_id
-    await message.answer(f"Твой правильный file_id:\n`{file_id}`", parse_mode="Markdown")
+    
+    # Твой правильный file_id видео
+    video_file_id = "BAACAgIAAxkBAAIrGWqujnZn-ijNnIrt_gJsams6kowAAymuAAJ39GhJYt62HlDP-GE9BA"
+    
+    await message.answer_video(
+        video=video_file_id,
+        caption="Добро пожаловать в Zer0Life! Выбери действие:",
+        reply_markup=keyboard
+    )
 
 async def on_startup(bot: Bot):
     await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
