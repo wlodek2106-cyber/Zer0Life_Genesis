@@ -25,7 +25,9 @@ async def cmd_start(message: types.Message):
         inline_keyboard=[
             [InlineKeyboardButton(text="🎮 Play", url="https://t.me/Zer0lifelabs_ai_bot")],
             [InlineKeyboardButton(text="💎 Buy ZRL", url="https://www.ponsfamily.com/launchpad/0x09bbf85C1C1ad7518847733fc64e161557056200")],
-            [InlineKeyboardButton(text="☕ Donate (SOL, ETH, BNB)", callback_data="donate_info")]
+            [InlineKeyboardButton(text="☕ Donate (SOL, ETH, BNB)", callback_data="donate_info")],
+            # 👇 ВОТ НОВАЯ КНОПКА РОДМАПА 👇
+            [InlineKeyboardButton(text="Roadmap ZRL 2026-2027 🗺️", callback_data="send_roadmap_pdf")]
         ]
     )
     
@@ -51,6 +53,16 @@ async def process_donate(callback: types.CallbackQuery):
     )
     await callback.message.answer(donate_text, parse_mode="Markdown")
     await callback.answer()
+
+# 👇 ВОТ НОВЫЙ ОБРАБОТЧИК ДЛЯ ОТПРАВКИ PDF 👇
+@dp.callback_query(F.data == "send_roadmap_pdf")
+async def process_roadmap(callback: types.CallbackQuery):
+    await callback.answer() # Убираем часики загрузки с кнопки
+    roadmap_file_id = "BQACAgIAAxkBAAIrUGqvljpeOrUy6gefjzpFea_tOn7dAALVogAC7ol5SSZ80YFFdnaQPQQ"
+    await callback.message.answer_document(
+        document=roadmap_file_id,
+        caption="Roadmap ZRL 2026-2027 🗺️"
+    )
 
 async def on_startup(bot: Bot):
     await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
