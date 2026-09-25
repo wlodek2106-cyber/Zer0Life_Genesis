@@ -1,147 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zer0life Run</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0b0c10;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+import os
+import sys
+import logging
+from aiohttp import web
+from aiogram import Bot, Dispatcher, F, types
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-        /* Контейнер с вашим фоновым изображением */
-        .main-container {
-            flex-grow: 1;
-            background-image: url('https://i.postimg.cc/J00FbBRZ/IMG-8899.jpg'); 
-            background-size: cover;
-            background-position: center top;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-        }
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-        /* Темный градиент снизу */
-        .main-container::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 60%;
-            background: linear-gradient(to top, rgba(11, 12, 16, 1) 10%, rgba(11, 12, 16, 0.8) 40%, transparent 100%);
-            z-index: 1;
-        }
+TOKEN = os.getenv("BOT_TOKEN")
+PORT = int(os.getenv("PORT", 10000))
+WEBHOOK_URL = "https://zer0life-genesis.onrender.com"
 
-        .content {
-            position: relative;
-            z-index: 2;
-            padding: 0 24px 40px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+if not TOKEN:
+    logging.error("BOT_TOKEN is not set!")
+    sys.exit(1)
 
-        .title {
-            font-size: 48px;
-            font-weight: 900;
-            font-style: italic;
-            text-transform: uppercase;
-            text-align: center;
-            line-height: 0.9;
-            margin-bottom: 8px;
-            transform: skewX(-5deg);
-        }
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-        .title-white {
-            color: #ffffff;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
+@dp.message(F.text == "/start")
+async def cmd_start(message: types.Message):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            # Здесь укажите прямую HTTPS-ссылку на ваше веб-приложение (HTML-файл)
+            [InlineKeyboardButton(text="🎮 Play", web_app=WebAppInfo(url="https://ВАШ_URL_ЗДЕСЬ.com"))],
+            [InlineKeyboardButton(text="💎 Buy ZRL", url="https://www.ponsfamily.com/launchpad/0x09bbf85C1C1ad7518847733fc64e161557056200")],
+            [InlineKeyboardButton(text="☕ Donate (SOL, ETH, BNB)", callback_data="donate_info")],
+            [InlineKeyboardButton(text="Roadmap ZRL 2026-2027 🗺️", callback_data="send_roadmap_pdf")]
+        ]
+    )
+    
+    video_file_id = "BAACAgIAAxkBAAIrGWqujnZn-ijNnIrt_gJsams6kowAAymuAAJ39GhJYt62HlDP-GE9BA"
+    
+    caption_text = "Welcome to Zer0Life! Choose an action:"
+    
+    await message.answer_video(
+        video=video_file_id,
+        caption=caption_text,
+        reply_markup=keyboard
+    )
 
-        .title-green {
-            color: #a8f07a;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
+# Обработчик нажатия на кнопку донатов
+@dp.callback_query(F.data == "donate_info")
+async def process_donate(callback: types.CallbackQuery):
+    donate_text = (
+        "☕ **Support the project:**\n\n"
+        "🔹 **Solana (SOL):**\n`5HX8uQvTE27DK27pRudHBGAy1EfR6uupDZssqkk3Yrpz`\n\n"
+        "🔹 **Ethereum (ETH):**\n`0x7901D7566766379f9ffc11326762883D6161183f`\n\n"
+        "🔹 **BNB (BSC):**\n`0x7901D7566766379f9ffc11326762883D6161183f`\n\n"
+        "Thank you for supporting Zer0Life! 🙏"
+    )
+    await callback.message.answer(donate_text, parse_mode="Markdown")
+    await callback.answer()
 
-        .subtitle {
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 32px;
-            opacity: 0.8;
-        }
+# Обработчик для отправки PDF с обновленным file_id
+@dp.callback_query(F.data == "send_roadmap_pdf")
+async def process_roadmap(callback: types.CallbackQuery):
+    await callback.answer() # Убираем часики загрузки с кнопки
+    roadmap_file_id = "BQACAgIAAxkBAAIraGqvnxP_eZvrrmMF9FkLNGKbK9F7AAIrowAC7ol5SZM2l2KFXMD3PQQ"
+    await callback.message.answer_document(
+        document=roadmap_file_id,
+        caption="Roadmap ZRL 2026-2027 🗺️"
+    )
 
-        .btn {
-            width: 100%;
-            padding: 18px;
-            border-radius: 16px;
-            border: none;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            transition: transform 0.1s;
-        }
+async def on_startup(bot: Bot):
+    await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+def main():
+    app = web.Application()
+    webhook_requests_handler = SimpleRequestHandler(
+        dispatcher=dp,
+        bot=bot,
+    )
+    webhook_requests_handler.register(app, path="/webhook")
+    setup_application(app, dp, bot=bot)
+    app.on_startup.append(lambda _: on_startup(bot))
+    web.run_app(app, host="0.0.0.0", port=PORT)
 
-        .btn-primary {
-            background-color: #a8f07a;
-            color: #000000;
-            margin-bottom: 12px;
-        }
-
-        .btn-secondary {
-            background-color: #1a1c23;
-            color: #ffffff;
-            border: 1px solid #2d303b;
-        }
-
-        .tg-icon {
-            width: 20px;
-            height: 20px;
-            fill: #a8f07a;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="main-container">
-        <div class="content">
-            <div class="title">
-                <div class="title-white">ZERØLIFE</div>
-                <div class="title-green">RUN</div>
-            </div>
-            
-            <div class="subtitle">Move to Earn</div>
-
-            <button class="btn btn-primary">
-                Get Started
-            </button>
-            
-            <button class="btn btn-secondary">
-                <svg class="tg-icon" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.25-5.61 3.66-.53.36-1.01.53-1.44.52-.47-.01-1.38-.26-2.05-.48-.83-.27-1.48-.42-1.42-.89.03-.25.38-.51 1.07-.78 4.2-1.82 7-3.02 8.4-3.61 4-.1.71-2.73.54-3.55.51z"/>
-                </svg>
-                Login with Telegram
-            </button>
-        </div>
-    </div>
-
-</body>
-</html>
+if __name__ == "__main__":
+    main()
