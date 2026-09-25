@@ -3,14 +3,14 @@ import sys
 import logging
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.getenv("PORT", 10000))
-WEBHOOK_URL = f"https://zer0life-genesis.onrender.com"
+WEBHOOK_URL = "https://zer0life-genesis.onrender.com"
 
 if not TOKEN:
     logging.error("BOT_TOKEN is not set!")
@@ -23,10 +23,10 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🎮 Play", url="https://t.me/Zer0lifelabs_ai_bot")],
+            # Здесь укажите прямую HTTPS-ссылку на ваше веб-приложение
+            [InlineKeyboardButton(text="🎮 Play", web_app=WebAppInfo(url="https://ВАШ_URL_ЗДЕСЬ.com"))],
             [InlineKeyboardButton(text="💎 Buy ZRL", url="https://www.ponsfamily.com/launchpad/0x09bbf85C1C1ad7518847733fc64e161557056200")],
             [InlineKeyboardButton(text="☕ Donate (SOL, ETH, BNB)", callback_data="donate_info")],
-            # Кнопка роадмапа в стартовом меню
             [InlineKeyboardButton(text="Roadmap ZRL 2026-2027 🗺️", callback_data="send_roadmap_pdf")]
         ]
     )
@@ -65,6 +65,7 @@ async def process_roadmap(callback: types.CallbackQuery):
     )
 
 async def on_startup(bot: Bot):
+    # Эта функция сама привяжет вашего бота к серверу Render при каждом запуске
     await bot.set_webhook(f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
 
 def main():
